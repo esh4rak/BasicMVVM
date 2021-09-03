@@ -1,4 +1,4 @@
-package com.example.basicmvvm;
+package com.example.basicmvvm.views;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 import com.example.basicmvvm.adapters.RecyclerAdapter;
 import com.example.basicmvvm.databinding.ActivityMainBinding;
 import com.example.basicmvvm.models.NicePlace;
@@ -21,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerAdapter mAdapter;
     private MainActivityViewModel mMainActivityViewModel;
+
+    ArrayList<NicePlace> mNicePlaces;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         mMainActivityViewModel.getNicePlaces().observe(this, new Observer<ArrayList<NicePlace>>() {
             @Override
             public void onChanged(@Nullable ArrayList<NicePlace> nicePlaces) {
+                mNicePlaces = nicePlaces;
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -64,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         binding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mMainActivityViewModel.addNewValue(
+                mMainActivityViewModel.addValue(
                         new NicePlace(
                                 "https://i.imgur.com/ZcLLrkY.jpg",
                                 "Washington"
@@ -73,14 +77,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         initRecyclerView();
+
+
     }
+
 
     private void initRecyclerView(){
         mAdapter = new RecyclerAdapter(this, mMainActivityViewModel.getNicePlaces().getValue());
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(linearLayoutManager);
         binding.recyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, View v) {
+
+                Toast.makeText(getApplicationContext(), mNicePlaces.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showProgressBar(){
