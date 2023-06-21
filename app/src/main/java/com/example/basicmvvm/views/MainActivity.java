@@ -4,7 +4,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
@@ -44,39 +43,28 @@ public class MainActivity extends AppCompatActivity {
         mMainActivityViewModel.init();
 
 
-        mMainActivityViewModel.getNicePlaces().observe(this, new Observer<ArrayList<NicePlace>>() {
-            @Override
-            public void onChanged(@Nullable ArrayList<NicePlace> nicePlaces) {
-                mNicePlaces = nicePlaces;
-                mAdapter.notifyDataSetChanged();
-            }
+        mMainActivityViewModel.getNicePlaces().observe(this, nicePlaces -> {
+            mNicePlaces = nicePlaces;
+            mAdapter.notifyDataSetChanged();
         });
 
-        mMainActivityViewModel.getIsUpdating().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                if(aBoolean){
-                    showProgressBar();
-                }
-                else{
-                    hideProgressBar();
-                    binding.recyclerView.smoothScrollToPosition(mMainActivityViewModel.getNicePlaces().getValue().size()-1);
-                }
+        mMainActivityViewModel.getIsUpdating().observe(this, aBoolean -> {
+            if(aBoolean){
+                showProgressBar();
+            }
+            else{
+                hideProgressBar();
+                binding.recyclerView.smoothScrollToPosition(mMainActivityViewModel.getNicePlaces().getValue().size()-1);
             }
         });
 
 
-        binding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mMainActivityViewModel.addValue(
-                        new NicePlace(
-                                "https://i.imgur.com/ZcLLrkY.jpg",
-                                "Washington"
-                        )
-                );
-            }
-        });
+        binding.floatingActionButton.setOnClickListener(view -> mMainActivityViewModel.addValue(
+                new NicePlace(
+                        "https://i.imgur.com/ZcLLrkY.jpg",
+                        "Washington"
+                )
+        ));
 
 
 
@@ -92,13 +80,7 @@ public class MainActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(linearLayoutManager);
         binding.recyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, View v) {
-
-                Toast.makeText(getApplicationContext(), mNicePlaces.get(position).getTitle(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        mAdapter.setOnItemClickListener((position, v) -> Toast.makeText(getApplicationContext(), mNicePlaces.get(position).getTitle(), Toast.LENGTH_SHORT).show());
     }
 
     private void showProgressBar(){
